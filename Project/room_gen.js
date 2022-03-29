@@ -1,36 +1,3 @@
-/**
-var cnv;
-
-function centerCanvas() {
-  var x = (windowWidth - width) / 2;
-  var y = (windowHeight - height) / 2;
-  cnv.position(x, y);
-}
-
-function setup() {
-  cnv = createCanvas(400, 400);
-  centerCanvas();
-  background(255, 0, 200);
-  //let bubble = new room_generator();
-
-  /**
-   *   createCanvas(PIXEL_SIZE*COLS, PIXEL_SIZE*ROWS);
-  background("#ffffff");
-  generate_dungeon_random();
-  frameRate(5); //add
-   
-}
-
-function windowResized() {
-  centerCanvas();
-}
-
-function draw() {
-  background(0);
-  ellipse(50,50,80,80);
-}
-*/
-
 // Chris Martens
 // Ported from .pde version, 2022-02-15
 
