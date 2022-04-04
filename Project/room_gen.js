@@ -137,4 +137,61 @@ class room_generator {
             }
         }
     }
+
+
+    setStartlocation() {
+
+    }
+  
+    //causes a lag spike
+    getRegions() {
+        let tiles_checked = [];
+        for (let i = 0; i < this.rows; i++) {
+            tiles_checked.push([]);
+        }
+        for (let j = 0; j < this.cols; j++) {
+            tiles_checked[i].push(0);
+        }
+      
+      
+        let regions = [];
+            for (let i=0; i < this.rows; i++) {
+                for (let j=0; j < this.cols; j++) {
+                    if(this.grid[i][j] == this.tile_types.floor) {
+                        let region = [];
+                        let queue = [];
+                        tiles_checked[i][j] = 1;
+                        //region.push(createVector(i,j));
+                        queue.push(createVector(i,j));
+                        while (queue.length > 0) {
+                            let coords = queue.shift();
+                            tiles_checked[coords.x][coords.y] = 1;
+                            region.push(coords);
+              
+                            if (region.length > 5) {
+                            //return region; //short cuts recursive process / probabily need exits to be interactable rather than leave on movement to
+                            //the last coords in the regions are being repeateded infinitely
+                            }
+              
+              
+                            for (let x = coords.x - 1; x <= coords.x + 1; x++) {
+                                for (let y = coords.y - 1; y <= coords.y + 1; y++) {
+                                    if ((x > 0 && x < this.rows && y > 0 && y < this.cols) && (x == coords.x || y == coords.y)) {
+                                        if (tiles_checked[x][y] == 0 && this.grid[x][y] == this.tile_types.floor) {
+                                    tiles_checked[x][y] == 1;
+                                    queue.push(createVector(x,y));
+                                        } 
+                                    }
+                                }
+                            }
+                        }
+                        if (region.length > 1) {
+                            return region;
+                        }
+                        regions.push(region);
+                    }
+                }
+            }
+        return regions;
+    }
 }
