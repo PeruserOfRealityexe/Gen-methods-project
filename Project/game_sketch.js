@@ -14,6 +14,7 @@ const ROOM_SIZE = 20;
 let max_iters = 5;
 let room;
 let room_grid;
+let player_pos, end_pos;
 
 const basic_tile_enum = Object.freeze({
     rock: 0,
@@ -54,12 +55,47 @@ function setup() {
     room.generate_room();
 
     room_grid = room.grid;
-    console.log(room_grid);
+    player_pos = findPos(-1);
+    end_pos = findPos(-2);
+    // console.log(player_pos);
+    // console.log(end_pos);
 
     frameRate(5);
 }
 
 function draw() {
+    // Up direction
+    if ((keyIsDown(87) || keyIsDown(UP_ARROW)) && player_pos[1] > 0 && room.grid[player_pos[0]][player_pos[1] - 1] == 1) {
+        room.update_grid(player_pos[0], player_pos[1], "row", -1);
+        player_pos = [player_pos[0], player_pos[1] - 1];
+    }
+    // Down direction
+    else if (
+        (keyIsDown(83) || keyIsDown(DOWN_ARROW)) &&
+        player_pos[1] < room.grid.length &&
+        room.grid[player_pos[0]][player_pos[1] + 1] == 1
+    ) {
+        room.update_grid(player_pos[0], player_pos[1], "row", 1);
+        player_pos = [player_pos[0], player_pos[1] + 1];
+    }
+    // Left direction
+    else if (
+        (keyIsDown(65) || keyIsDown(LEFT_ARROW)) &&
+        player_pos[0] < room.grid.length &&
+        room.grid[player_pos[0] - 1][player_pos[1]] == 1
+    ) {
+        room.update_grid(player_pos[0], player_pos[1], "column", -1);
+        player_pos = [player_pos[0] - 1, player_pos[1]];
+    }
+    // Right direction
+    else if (
+        (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) &&
+        player_pos[0] < room.grid.length &&
+        room.grid[player_pos[0] + 1][player_pos[1]] == 1
+    ) {
+        room.update_grid(player_pos[0], player_pos[1], "column", 1);
+        player_pos = [player_pos[0] + 1, player_pos[1]];
+    }
     room.render_room(basic_tile_scheme);
     stroke("white");
     strokeWeight(5);
@@ -70,4 +106,19 @@ function draw() {
 function mousePressed() {
     room.generate_dungeon_random();
     room.generate_room();
+    player_pos = findPos(-1);
+    end_pos = findPos(-2);
+}
+
+// Finds position of a given value in 2d grid array
+function findPos(value) {
+    // Check every column
+    for (let i = 0; i < room.grid.length; i++) {
+        // Check every row
+        for (let j = 0; j < room.grid.length; j++) {
+            if (room.grid[i][j] == value) {
+                return [i, j]; // Returns [column, row] of the wanted value
+            }
+        }
+    }
 }

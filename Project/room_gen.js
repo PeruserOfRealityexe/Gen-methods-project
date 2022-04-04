@@ -24,7 +24,18 @@ class room_generator {
         if (this.num_iters == this.max_iters) {
             this.iterate_cells(this.update_wall);
         }
-        console.log(this);
+        let y = Math.floor(Math.random() * this.cols);
+        let x = Math.floor(Math.random() * this.cols);
+        while (this.grid[y][x] != 1) {
+            y = Math.floor(Math.random() * this.cols);
+            x = Math.floor(Math.random() * this.cols);
+        }
+        this.grid[y][x] = -1
+        while (this.grid[y][x] != 1) {
+            y = Math.floor(Math.random() * this.cols);
+            x = Math.floor(Math.random() * this.cols);
+        }
+        this.grid[y][x] = -2
     }
 
     // Generates the first iteration of a room layout
@@ -117,6 +128,18 @@ class room_generator {
         return nbr_value;
     }
 
+    // Updates grid if player presses a valid direction key
+    update_grid(col, row, orientation, direction) {
+        this.grid[col][row] = 1;
+        if (orientation == "row") {
+            this.grid[col][row] = 1;
+            this.grid[col][row + direction] = -1;
+        }
+        else if (orientation == "column") {
+            this.grid[col + direction][row] = -1
+        }
+    }
+
     //Renders the grid to the canvas
     render_room(colorset) {
         for (let i = 0; i < this.rows; i++) {
@@ -132,6 +155,14 @@ class room_generator {
                 } else if (this.grid[i][j] == this.tile_types.wall) {
                     fill(colorset.wall_color);
                     stroke(colorset.wall_color);
+                    rect(i * this.p_size, j * this.p_size, this.p_size, this.p_size);
+                } else if (this.grid[i][j] == this.tile_types.player) {
+                    fill(colorset.player_color);
+                    stroke(colorset.player_color);
+                    rect(i * this.p_size, j * this.p_size, this.p_size, this.p_size);
+                } else if (this.grid[i][j] == this.tile_types.end) {
+                    fill(colorset.end_color);
+                    stroke(colorset.end_color);
                     rect(i * this.p_size, j * this.p_size, this.p_size, this.p_size);
                 }
             }
