@@ -64,38 +64,7 @@ function setup() {
 }
 
 function draw() {
-    // Up direction
-    if ((keyIsDown(87) || keyIsDown(UP_ARROW)) && player_pos[1] > 0 && room.grid[player_pos[0]][player_pos[1] - 1] == 1) {
-        room.update_grid(player_pos[0], player_pos[1], "row", -1);
-        player_pos = [player_pos[0], player_pos[1] - 1];
-    }
-    // Down direction
-    else if (
-        (keyIsDown(83) || keyIsDown(DOWN_ARROW)) &&
-        player_pos[1] < room.grid.length &&
-        room.grid[player_pos[0]][player_pos[1] + 1] == 1
-    ) {
-        room.update_grid(player_pos[0], player_pos[1], "row", 1);
-        player_pos = [player_pos[0], player_pos[1] + 1];
-    }
-    // Left direction
-    else if (
-        (keyIsDown(65) || keyIsDown(LEFT_ARROW)) &&
-        player_pos[0] < room.grid.length &&
-        room.grid[player_pos[0] - 1][player_pos[1]] == 1
-    ) {
-        room.update_grid(player_pos[0], player_pos[1], "column", -1);
-        player_pos = [player_pos[0] - 1, player_pos[1]];
-    }
-    // Right direction
-    else if (
-        (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) &&
-        player_pos[0] < room.grid.length &&
-        room.grid[player_pos[0] + 1][player_pos[1]] == 1
-    ) {
-        room.update_grid(player_pos[0], player_pos[1], "column", 1);
-        player_pos = [player_pos[0] + 1, player_pos[1]];
-    }
+    check_input_direction();
     room.render_room(basic_tile_scheme);
     stroke("white");
     strokeWeight(5);
@@ -104,10 +73,7 @@ function draw() {
 }
 
 function mousePressed() {
-    room.generate_dungeon_random();
-    room.generate_room();
-    player_pos = findPos(-1);
-    end_pos = findPos(-2);
+    generate_new_level();
 }
 
 // Finds position of a given value in 2d grid array
@@ -121,4 +87,64 @@ function findPos(value) {
             }
         }
     }
+}
+
+// Determines what direction player is moving and updates the player grid
+function check_input_direction() {
+    // Up direction
+    if ((keyIsDown(87) || keyIsDown(UP_ARROW)) && player_pos[1] > 0 && room.grid[player_pos[0]][player_pos[1] - 1] != 2) {
+        // If moving to exit, a new level is generated
+        if (room.grid[player_pos[0]][player_pos[1] - 1] == -2) {
+            return generate_new_level();
+        }
+        room.update_grid(player_pos[0], player_pos[1], "row", -1);
+        player_pos = [player_pos[0], player_pos[1] - 1];
+    }
+    // Down direction
+    else if (
+        (keyIsDown(83) || keyIsDown(DOWN_ARROW)) &&
+        player_pos[1] < room.grid.length &&
+        room.grid[player_pos[0]][player_pos[1] + 1] != 2
+    ) {
+        // If moving to exit, a new level is generated
+        if (room.grid[player_pos[0]][player_pos[1] + 1] == -2) {
+            return generate_new_level();
+        }
+        room.update_grid(player_pos[0], player_pos[1], "row", 1);
+        player_pos = [player_pos[0], player_pos[1] + 1];
+    }
+    // Left direction
+    else if (
+        (keyIsDown(65) || keyIsDown(LEFT_ARROW)) &&
+        player_pos[0] < room.grid.length &&
+        room.grid[player_pos[0] - 1][player_pos[1]] != 2
+    ) {
+        // If moving to exit, a new level is generated
+        if (room.grid[player_pos[0] - 1][player_pos[1]] == -2) {
+            return generate_new_level();
+        }
+        room.update_grid(player_pos[0], player_pos[1], "column", -1);
+        player_pos = [player_pos[0] - 1, player_pos[1]];
+    }
+    // Right direction
+    else if (
+        (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) &&
+        player_pos[0] < room.grid.length &&
+        room.grid[player_pos[0] + 1][player_pos[1]] != 2
+    ) {
+        // If moving to exit, a new level is generated
+        if (room.grid[player_pos[0] + 1][player_pos[1]] == -2) {
+            return generate_new_level();
+        }
+        room.update_grid(player_pos[0], player_pos[1], "column", 1);
+        player_pos = [player_pos[0] + 1, player_pos[1]];
+    }
+}
+
+// Generates a new level and saves the player and exit locations
+function generate_new_level() {
+    room.generate_dungeon_random();
+    room.generate_room();
+    player_pos = findPos(-1);
+    end_pos = findPos(-2);
 }

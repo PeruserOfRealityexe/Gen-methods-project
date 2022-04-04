@@ -30,12 +30,12 @@ class room_generator {
             y = Math.floor(Math.random() * this.cols);
             x = Math.floor(Math.random() * this.cols);
         }
-        this.grid[y][x] = -1
+        this.grid[y][x] = -1;
         while (this.grid[y][x] != 1) {
             y = Math.floor(Math.random() * this.cols);
             x = Math.floor(Math.random() * this.cols);
         }
-        this.grid[y][x] = -2
+        this.grid[y][x] = -2;
     }
 
     // Generates the first iteration of a room layout
@@ -134,9 +134,8 @@ class room_generator {
         if (orientation == "row") {
             this.grid[col][row] = 1;
             this.grid[col][row + direction] = -1;
-        }
-        else if (orientation == "column") {
-            this.grid[col + direction][row] = -1
+        } else if (orientation == "column") {
+            this.grid[col + direction][row] = -1;
         }
     }
 
