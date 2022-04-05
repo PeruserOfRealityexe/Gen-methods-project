@@ -53,6 +53,7 @@ function setup() {
 
     room.generate_dungeon_random();
     room.generate_room();
+    console.log(room.getRegions()); //Added
 
     room_grid = room.grid;
     player_pos = findPos(-1);

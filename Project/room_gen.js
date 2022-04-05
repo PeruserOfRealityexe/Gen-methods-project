@@ -178,10 +178,12 @@ class room_generator {
         let tiles_checked = [];
         for (let i = 0; i < this.rows; i++) {
             tiles_checked.push([]);
+            for (let j = 0; j < this.cols; j++) {
+                tiles_checked[i].push(0);
+            }
         }
-        for (let j = 0; j < this.cols; j++) {
-            tiles_checked[i].push(0);
-        }
+
+        
       
       
         let regions = [];
@@ -195,12 +197,13 @@ class room_generator {
                         queue.push(createVector(i,j));
                         while (queue.length > 0) {
                             let coords = queue.shift();
-                            tiles_checked[coords.x][coords.y] = 1;
+                            //tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
                             region.push(coords);
               
                             if (region.length > 5) {
                             //return region; //short cuts recursive process / probabily need exits to be interactable rather than leave on movement to
-                            //the last coords in the regions are being repeateded infinitely
+                            //the last coords in the regions are being repeateded infinitely i think, needs more testing
+                            // potention short cut ensures minimum of traverseable space
                             }
               
               
@@ -215,9 +218,9 @@ class room_generator {
                                 }
                             }
                         }
-                        if (region.length > 1) {
-                            return region;
-                        }
+                        //if (region.length > 1) {
+                            //return region;
+                        //}
                         regions.push(region);
                     }
                 }
