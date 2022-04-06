@@ -24,6 +24,23 @@ class room_generator {
         if (this.num_iters == this.max_iters) {
             this.iterate_cells(this.update_wall);
         }
+        //
+        let regions = this.getRegions();//
+        console.log(regions);
+        let room_size = 2;
+        let idx = 0;
+        for(let x = 0; x < regions.length; x++) {
+            //maybe add length var here
+            if (regions[x].length >= room_size) {
+                idx = x;
+                room_size = regions[x].length;
+            }
+        }
+        this.grid[regions[idx][0].x][regions[idx][0].y]=-1;
+        this.grid[regions[idx][room_size - 1].x][regions[idx][room_size - 1].y]=-2;
+
+        //
+        /** 
         let y = Math.floor(Math.random() * this.cols);
         let x = Math.floor(Math.random() * this.cols);
         while (this.grid[y][x] != 1) {
@@ -36,6 +53,7 @@ class room_generator {
             x = Math.floor(Math.random() * this.cols);
         }
         this.grid[y][x] = -2;
+        */
     }
 
     // Generates the first iteration of a room layout
@@ -173,7 +191,8 @@ class room_generator {
 
     }
   
-    //causes a lag spike
+    //causes a lag spike, maybe add a start location
+    //So currently this works MOST of the time but i can lag still
     getRegions() {
         let tiles_checked = [];
         for (let i = 0; i < this.rows; i++) {
@@ -189,22 +208,31 @@ class room_generator {
         let regions = [];
             for (let i=0; i < this.rows; i++) {
                 for (let j=0; j < this.cols; j++) {
-                    if(this.grid[i][j] == this.tile_types.floor) {
+                    if(this.grid[i][j] == this.tile_types.floor && tiles_checked[i][j] == 0) {
                         let region = [];
                         let queue = [];
                         tiles_checked[i][j] = 1;
                         //region.push(createVector(i,j));
                         queue.push(createVector(i,j));
-                        while (queue.length > 0) {
+                        while (queue.length > 0) { // might be able to cull any lagging through checking that the legth of the current region isn't above 30 or somthing
                             let coords = queue.shift();
-                            //tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
+                            tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
+                            
+                            let added = false;
+                            for (let x = 0; x < region.length; x++) {
+                                if (coords.equals(region[x])) {
+                                    added = !added;
+                                }
+                            }
+                            if (!added) {
                             region.push(coords);
+                            }
               
-                            if (region.length > 5) {
+                            //if (region.length > 5) {
                             //return region; //short cuts recursive process / probabily need exits to be interactable rather than leave on movement to
                             //the last coords in the regions are being repeateded infinitely i think, needs more testing
                             // potention short cut ensures minimum of traverseable space
-                            }
+                            //}
               
               
                             for (let x = coords.x - 1; x <= coords.x + 1; x++) {
@@ -218,7 +246,7 @@ class room_generator {
                                 }
                             }
                         }
-                        //if (region.length > 1) {
+                        //if (region.length > 1) { 
                             //return region;
                         //}
                         regions.push(region);
