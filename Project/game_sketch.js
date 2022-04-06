@@ -48,6 +48,7 @@ function setup() {
     cnv = createCanvas(PIXEL_SIZE * ROOM_SIZE, PIXEL_SIZE * ROOM_SIZE);
     centerCanvas();
     background("#000000");
+    ellipseMode(RADIUS);
 
     room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE);
 
@@ -66,6 +67,7 @@ function setup() {
 function draw() {
     check_input_direction();
     room.render_room(basic_tile_scheme);
+    drawGradient(player_pos[0] * PIXEL_SIZE + PIXEL_SIZE / 2, player_pos[1] * PIXEL_SIZE + PIXEL_SIZE / 2);
     stroke("white");
     strokeWeight(5);
     noFill();
@@ -147,4 +149,14 @@ function generate_new_level() {
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
+}
+
+//
+function drawGradient(y, x) {
+    let radius = 50;
+    noStroke();
+    for (let r = radius; r > 0; --r) {
+        fill(0, 0, 0, 0);
+        ellipse(y, x, r, r);
+    }
 }
