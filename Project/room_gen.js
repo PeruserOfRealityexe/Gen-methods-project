@@ -216,17 +216,17 @@ class room_generator {
                         queue.push(createVector(i,j));
                         while (queue.length > 0) { // might be able to cull any lagging through checking that the legth of the current region isn't above 30 or somthing
                             let coords = queue.shift();
-                            tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
+                            //tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
                             
-                            let added = false;
-                            for (let x = 0; x < region.length; x++) {
-                                if (coords.equals(region[x])) {
-                                    added = !added;
-                                }
-                            }
-                            if (!added) {
+                            //let added = false;
+                            //for (let x = 0; x < region.length; x++) {
+                            //    if (coords.equals(region[x])) {
+                            //        added = !added;
+                            //    }
+                            //}
+                            //if (!added) {
                             region.push(coords);
-                            }
+                            //}
               
                             //if (region.length > 5) {
                             //return region; //short cuts recursive process / probabily need exits to be interactable rather than leave on movement to
@@ -239,8 +239,8 @@ class room_generator {
                                 for (let y = coords.y - 1; y <= coords.y + 1; y++) {
                                     if ((x > 0 && x < this.rows && y > 0 && y < this.cols) && (x == coords.x || y == coords.y)) {
                                         if (tiles_checked[x][y] == 0 && this.grid[x][y] == this.tile_types.floor) {
-                                    tiles_checked[x][y] == 1;
-                                    queue.push(createVector(x,y));
+                                            tiles_checked[x][y] = 1;
+                                            queue.push(createVector(x,y));
                                         } 
                                     }
                                 }
