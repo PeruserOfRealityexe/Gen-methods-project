@@ -15,6 +15,7 @@ let max_iters = 5;
 let room;
 let room_grid;
 let player_pos, end_pos;
+let key_buffer = [];
 
 const basic_tile_enum = Object.freeze({
     rock: 0,
@@ -65,6 +66,7 @@ function setup() {
 }
 
 function draw() {
+    queueInputs();
     check_input_direction();
     room.render_room(basic_tile_scheme);
     drawGradient(player_pos[0] * PIXEL_SIZE + PIXEL_SIZE / 2, player_pos[1] * PIXEL_SIZE + PIXEL_SIZE / 2);
@@ -91,57 +93,128 @@ function findPos(value) {
     }
 }
 
-// Determines what direction player is moving and updates the player grid
-function check_input_direction() {
-    // Up direction
-    if ((keyIsDown(87) || keyIsDown(UP_ARROW)) && player_pos[1] > 0 && room.grid[player_pos[0]][player_pos[1] - 1] != 2) {
-        // If moving to exit, a new level is generated
-        if (room.grid[player_pos[0]][player_pos[1] - 1] == -2) {
-            return generate_new_level();
-        }
-        room.update_grid(player_pos[0], player_pos[1], "row", -1);
-        player_pos = [player_pos[0], player_pos[1] - 1];
+function queueInputs() {
+    if (keyIsDown(87) || keyIsDown(UP_ARROW)) {
+        key_buffer = key_buffer.slice(-3).concat("UP");
     }
-    // Down direction
-    else if (
-        (keyIsDown(83) || keyIsDown(DOWN_ARROW)) &&
-        player_pos[1] < room.grid.length &&
-        room.grid[player_pos[0]][player_pos[1] + 1] != 2
-    ) {
-        // If moving to exit, a new level is generated
-        if (room.grid[player_pos[0]][player_pos[1] + 1] == -2) {
-            return generate_new_level();
-        }
-        room.update_grid(player_pos[0], player_pos[1], "row", 1);
-        player_pos = [player_pos[0], player_pos[1] + 1];
+    if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) {
+        key_buffer = key_buffer.slice(-3).concat("DOWN");
     }
-    // Left direction
-    else if (
-        (keyIsDown(65) || keyIsDown(LEFT_ARROW)) &&
-        player_pos[0] < room.grid.length &&
-        room.grid[player_pos[0] - 1][player_pos[1]] != 2
-    ) {
-        // If moving to exit, a new level is generated
-        if (room.grid[player_pos[0] - 1][player_pos[1]] == -2) {
-            return generate_new_level();
-        }
-        room.update_grid(player_pos[0], player_pos[1], "column", -1);
-        player_pos = [player_pos[0] - 1, player_pos[1]];
+    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+        key_buffer = key_buffer.slice(-3).concat("LEFT");
     }
-    // Right direction
-    else if (
-        (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) &&
-        player_pos[0] < room.grid.length &&
-        room.grid[player_pos[0] + 1][player_pos[1]] != 2
-    ) {
-        // If moving to exit, a new level is generated
-        if (room.grid[player_pos[0] + 1][player_pos[1]] == -2) {
-            return generate_new_level();
-        }
-        room.update_grid(player_pos[0], player_pos[1], "column", 1);
-        player_pos = [player_pos[0] + 1, player_pos[1]];
+    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+        key_buffer = key_buffer.slice(-3).concat("RIGHT");
     }
 }
+
+// Determines what direction player is moving and updates the player grid
+// Movement is only allowed if the player is moving to a floor or exit space
+function check_input_direction() {
+    while (key_buffer.length > 0) {
+        let current_key = key_buffer.shift();
+        // Up direction
+        if (current_key == "UP" && player_pos[1] > 0 && [1, -2].includes(room.grid[player_pos[0]][player_pos[1] - 1])) {
+            // If moving to exit, a new level is generated
+            if (room.grid[player_pos[0]][player_pos[1] - 1] == -2) {
+                return generate_new_level();
+            }
+            room.update_grid(player_pos[0], player_pos[1], "row", -1);
+            player_pos = [player_pos[0], player_pos[1] - 1];
+        }
+        // Down direction
+        else if (
+            current_key == "DOWN" &&
+            player_pos[1] < room.grid.length &&
+            [1, -2].includes(room.grid[player_pos[0]][player_pos[1] + 1])
+        ) {
+            // If moving to exit, a new level is generated
+            if (room.grid[player_pos[0]][player_pos[1] + 1] == -2) {
+                return generate_new_level();
+            }
+            room.update_grid(player_pos[0], player_pos[1], "row", 1);
+            player_pos = [player_pos[0], player_pos[1] + 1];
+        }
+        // Left direction
+        else if (
+            current_key == "LEFT" &&
+            player_pos[0] < room.grid.length &&
+            [1, -2].includes(room.grid[player_pos[0] - 1][player_pos[1]])
+        ) {
+            // If moving to exit, a new level is generated
+            if (room.grid[player_pos[0] - 1][player_pos[1]] == -2) {
+                return generate_new_level();
+            }
+            room.update_grid(player_pos[0], player_pos[1], "column", -1);
+            player_pos = [player_pos[0] - 1, player_pos[1]];
+        }
+        // Right direction
+        else if (
+            current_key == "RIGHT" &&
+            player_pos[0] < room.grid.length &&
+            [1, -2].includes(room.grid[player_pos[0] + 1][player_pos[1]])
+        ) {
+            // If moving to exit, a new level is generated
+            if (room.grid[player_pos[0] + 1][player_pos[1]] == -2) {
+                return generate_new_level();
+            }
+            room.update_grid(player_pos[0], player_pos[1], "column", 1);
+            player_pos = [player_pos[0] + 1, player_pos[1]];
+        }
+    }
+}
+
+// // Determines what direction player is moving and updates the player grid
+// function check_input_direction() {
+//     // Up direction
+//     if ((keyIsDown(87) || keyIsDown(UP_ARROW)) && player_pos[1] > 0 && room.grid[player_pos[0]][player_pos[1] - 1] == 1) {
+//         // If moving to exit, a new level is generated
+//         if (room.grid[player_pos[0]][player_pos[1] - 1] == -2) {
+//             return generate_new_level();
+//         }
+//         room.update_grid(player_pos[0], player_pos[1], "row", -1);
+//         player_pos = [player_pos[0], player_pos[1] - 1];
+//     }
+//     // Down direction
+//     else if (
+//         (keyIsDown(83) || keyIsDown(DOWN_ARROW)) &&
+//         player_pos[1] < room.grid.length &&
+//         room.grid[player_pos[0]][player_pos[1] + 1] == 1
+//     ) {
+//         // If moving to exit, a new level is generated
+//         if (room.grid[player_pos[0]][player_pos[1] + 1] == -2) {
+//             return generate_new_level();
+//         }
+//         room.update_grid(player_pos[0], player_pos[1], "row", 1);
+//         player_pos = [player_pos[0], player_pos[1] + 1];
+//     }
+//     // Left direction
+//     else if (
+//         (keyIsDown(65) || keyIsDown(LEFT_ARROW)) &&
+//         player_pos[0] < room.grid.length &&
+//         room.grid[player_pos[0] - 1][player_pos[1]] == 1
+//     ) {
+//         // If moving to exit, a new level is generated
+//         if (room.grid[player_pos[0] - 1][player_pos[1]] == -2) {
+//             return generate_new_level();
+//         }
+//         room.update_grid(player_pos[0], player_pos[1], "column", -1);
+//         player_pos = [player_pos[0] - 1, player_pos[1]];
+//     }
+//     // Right direction
+//     else if (
+//         (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) &&
+//         player_pos[0] < room.grid.length &&
+//         room.grid[player_pos[0] + 1][player_pos[1]] == 1
+//     ) {
+//         // If moving to exit, a new level is generated
+//         if (room.grid[player_pos[0] + 1][player_pos[1]] == -2) {
+//             return generate_new_level();
+//         }
+//         room.update_grid(player_pos[0], player_pos[1], "column", 1);
+//         player_pos = [player_pos[0] + 1, player_pos[1]];
+//     }
+// }
 
 // Generates a new level and saves the player and exit locations
 function generate_new_level() {
