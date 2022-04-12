@@ -11,7 +11,7 @@ function genPalette(type){
     }
 
     // const baseColor = color(15, 95, 60);
-    const baseColor = levels[type];
+    const baseColor = levels[type] || color(15, 95, 60);
 
     const shades = [];
 
