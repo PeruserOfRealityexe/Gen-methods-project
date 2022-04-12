@@ -42,8 +42,10 @@ class markovGen {
             var possibilities = this.ngrams[this.currentGram];
             if (possibilities) {
                 var next = random(possibilities);
-                this.currentGram = next;
-                break;
+                if(next){
+                    this.currentGram = next;
+                    break;
+                }
             }
         }
         return next;
