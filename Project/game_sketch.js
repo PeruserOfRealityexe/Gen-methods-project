@@ -12,6 +12,7 @@ const ROOM_SIZE = 20;
 
 // Global variables
 let max_iters = 5;
+let room_num = 0; // Number of rooms generated
 let room;
 let room_grid;
 let player_pos, end_pos;
@@ -174,7 +175,8 @@ function check_input_direction() {
 
 // Generates a new level and saves the player and exit locations
 function generate_new_level() {
-    room.generate_dungeon_random();
+    room.generate_dungeon_random((0.99 - (room_num * 0.01) < 0.5 ? 0.5 : 0.99 - (room_num * 0.01))); //if < 0.5 set to 0.5
+    room_num++;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);

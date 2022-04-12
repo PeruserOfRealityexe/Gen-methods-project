@@ -57,13 +57,13 @@ class room_generator {
     }
 
     // Generates the first iteration of a room layout
-    generate_dungeon_random() {
+    generate_dungeon_random(floor_value) {
         this.grid = [];
         this.num_iters = 0;
         for (let i = 0; i < this.rows; i++) {
             this.grid.push([]);
             for (let j = 0; j < this.cols; j++) {
-                if (random(1) <= 0.5) { //0.9 works (in theory, the progression system should work, just need to pass the random value in)
+                if (random(1) <= floor_value) { //0.9 works (in theory, the progression system should work, just need to pass the random value in)
                     // Flips a coin to determine tiletype
                     this.grid[i].push(this.tile_types.floor);
                 } else {
