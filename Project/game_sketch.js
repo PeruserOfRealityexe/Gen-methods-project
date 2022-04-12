@@ -17,6 +17,7 @@ let room;
 let room_grid;
 let player_pos, end_pos;
 let key_buffer = [];
+let mchain;
 
 const basic_tile_enum = Object.freeze({
     rock: 0,
@@ -26,13 +27,13 @@ const basic_tile_enum = Object.freeze({
     end: -2,
 });
 
-const basic_tile_scheme = Object.freeze({
+let basic_tile_scheme = {
     floor_color: "#ffffff", // black - can
     rock_color: "#000000", // white - can travel 1
     wall_color: "#858585", // med/dark grey
     player_color: "green",
     end_color: "red",
-});
+};
 
 var cnv;
 
@@ -51,17 +52,16 @@ function setup() {
     centerCanvas();
     background("#000000");
     ellipseMode(RADIUS);
-
+    colorMode(HSB);
     room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE);
 
-    room.generate_dungeon_random(0.99 - (room_num * 0.01));
-    room_num++;
-    room.generate_room();
+    mchain = new markovGen(50);
+
+    generate_new_level();
     //console.log(room.getRegions()); //Added
 
     room_grid = room.grid;
-    player_pos = findPos(-1);
-    end_pos = findPos(-2);
+    
     // console.log(player_pos);
     // console.log(end_pos);
 
@@ -180,6 +180,13 @@ function generate_new_level() {
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
+    let c = mchain.markovState();
+    let shades = genPalette(c);
+    basic_tile_scheme['floor_color'] = shades[0];
+    basic_tile_scheme['wall_color'] = shades[2];
+    basic_tile_scheme['rock_color'] = shades[4];
+    console.log(shades);
+    console.log(c);
 }
 
 //
