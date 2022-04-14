@@ -18,6 +18,7 @@ let room_grid;
 let player_pos, end_pos;
 let key_buffer = [];
 let mchain;
+let sound;
 
 const basic_tile_enum = Object.freeze({
     rock: 0,
@@ -48,6 +49,7 @@ function windowResized() {
 }
 
 function setup() {
+    sound = loadSound('audio/suspense-loop-3.wav');
     cnv = createCanvas(PIXEL_SIZE * ROOM_SIZE, PIXEL_SIZE * ROOM_SIZE);
     centerCanvas();
     background("#000000");
@@ -61,7 +63,7 @@ function setup() {
     //console.log(room.getRegions()); //Added
 
     room_grid = room.grid;
-    
+
     // console.log(player_pos);
     // console.log(end_pos);
 
@@ -69,6 +71,7 @@ function setup() {
 }
 
 function draw() {
+    
     queueInputs();
     check_input_direction();
     room.render_room(basic_tile_scheme);
@@ -79,9 +82,16 @@ function draw() {
     square(0, 0, PIXEL_SIZE * ROOM_SIZE);
 }
 
+function keyPressed() {
+    if(!sound.isPlaying()) {
+        sound.play();
+        sound.loop();
+    }
+}
+
 // Generates a new level when the mouse is clicked
 function mousePressed() {
-    generate_new_level();
+    
 }
 
 // Finds position of a given value in 2d grid array
