@@ -15,6 +15,7 @@ const FRAME_RATE = 5;
 let level = 1; // Current level the player is on
 let difficulty_level = 1; // Current visibility difficulty level
 let max_iters = 5;
+let room_num = 0; // Number of rooms generated
 let room;
 let room_grid;
 let player_pos, end_pos;
@@ -23,6 +24,8 @@ let start_visibility = 150; // Radius in pixels of edge of complete visibility
 let end_visibility = 300; // Radius in pixels of edge of visibility
 let visibility_increment = 5; // Number of levels to change visibility ranges
 let max_visibility_level = 30; // Number of levels where visibility will no longer change
+let mchain;
+let sound;
 
 const basic_tile_enum = Object.freeze({
     rock: 0,
@@ -32,13 +35,13 @@ const basic_tile_enum = Object.freeze({
     end: -2,
 });
 
-const basic_tile_scheme = Object.freeze({
+let basic_tile_scheme = {
     floor_color: "#ffffff", // black - can
     rock_color: "#000000", // white - can travel 1
     wall_color: "#858585", // med/dark grey
     player_color: "green",
     end_color: "red",
-});
+};
 
 var cnv;
 
@@ -53,19 +56,21 @@ function windowResized() {
 }
 
 function setup() {
+    sound = loadSound("audio/suspense-loop-3.wav");
     cnv = createCanvas(PIXEL_SIZE * ROOM_SIZE + 100, PIXEL_SIZE * ROOM_SIZE);
     centerCanvas();
     background("#000000");
     ellipseMode(RADIUS);
-
+    colorMode(HSB);
     room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE);
 
-    room.generate_dungeon_random();
-    room.generate_room();
+    mchain = new markovGen(50);
+
+    generate_new_level();
+    //console.log(room.getRegions()); //Added
 
     room_grid = room.grid;
-    player_pos = findPos(-1);
-    end_pos = findPos(-2);
+
     // console.log(player_pos);
     // console.log(end_pos);
 
@@ -86,6 +91,13 @@ function draw() {
     fill("white");
     text("Level: " + level.toString(), PIXEL_SIZE * ROOM_SIZE + 20, 30);
     text("Difficulty: " + difficulty_level.toString(), PIXEL_SIZE * ROOM_SIZE + 20, 50);
+}
+
+function keyPressed() {
+    if (!sound.isPlaying()) {
+        sound.play();
+        sound.loop();
+    }
 }
 
 // Generates a new level when the mouse is clicked
@@ -192,10 +204,18 @@ function generate_new_level(level_increment) {
             difficulty_level = difficulty_level + 1;
         }
     }
-    room.generate_dungeon_random();
+    room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
+    room_num++;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
+    let c = mchain.markovState();
+    let shades = genPalette(c);
+    basic_tile_scheme["floor_color"] = shades[0];
+    basic_tile_scheme["wall_color"] = shades[2];
+    basic_tile_scheme["rock_color"] = shades[4];
+    console.log(shades);
+    console.log(c);
 }
 
 // Adjusts the visibility ranges as the difficulty increases
