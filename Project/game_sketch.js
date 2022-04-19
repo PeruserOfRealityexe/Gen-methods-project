@@ -186,7 +186,7 @@ function check_input_direction() {
 // Generates a new level and saves the player and exit locations
 function generate_new_level() {
     room.generate_dungeon_random((0.99 - (room_num * 0.01) < 0.5 ? 0.5 : 0.99 - (room_num * 0.01))); //if < 0.5 set to 0.5
-    room_num++;
+    room_num = room_num + 1.5;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
