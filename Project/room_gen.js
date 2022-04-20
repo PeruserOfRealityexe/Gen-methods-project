@@ -17,7 +17,7 @@ class room_generator {
 
     // Takes the random layout and iterate on the cells
     generate_room() {
-        console.log(this);
+        // console.log(this);
         while (this.num_iters < this.max_iters) {
             this.iterate_cells(this.update_cell);
         }
