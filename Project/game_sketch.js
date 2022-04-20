@@ -6,7 +6,7 @@ const PIXEL_SIZE = 24;
 //const ROCK = 0, FLOOR = 1, WALL = 2, ITEM = 3; //added item
 //const START = -1, END = -2;
 const ROOM_SIZE = 20;
-const FRAME_RATE = 5;
+const FRAME_RATE = 10;
 
 // CA rule parameters
 //const T1 = 5, T2 = 4;
@@ -205,7 +205,7 @@ function generate_new_level(level_increment) {
         }
     }
     room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
-    room_num++;
+    room_num = room_num + 1.5;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
