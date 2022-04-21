@@ -23,7 +23,7 @@ let key_buffer = [];
 let start_visibility = 150; // Radius in pixels of edge of complete visibility
 let end_visibility = 300; // Radius in pixels of edge of visibility
 let visibility_increment = 5; // Number of levels to change visibility ranges
-let max_visibility_level = 30; // Number of levels where visibility will no longer change
+let max_visibility_level = 20; // Number of levels where visibility will no longer change
 let mchain;
 let sound;
 
@@ -205,7 +205,7 @@ function generate_new_level(level_increment) {
         }
     }
     room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
-    room_num = room_num + 1.5;
+    room_num = room_num + 1.75;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
