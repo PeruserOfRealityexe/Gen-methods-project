@@ -101,9 +101,9 @@ function keyPressed() {
 }
 
 // Generates a new level when the mouse is clicked
-function mousePressed() {
-    generate_new_level(false);
-}
+// function mousePressed() {
+//     generate_new_level(false);
+// }
 
 // Finds position of a given value in 2d grid array
 function findPos(value) {
