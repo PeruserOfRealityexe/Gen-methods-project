@@ -22,8 +22,8 @@ let player_pos, end_pos;
 let key_buffer = [];
 let start_visibility = 150; // Radius in pixels of edge of complete visibility
 let end_visibility = 300; // Radius in pixels of edge of visibility
-let visibility_increment = 5; // Number of levels to change visibility ranges
-let max_visibility_level = 20; // Number of levels where visibility will no longer change
+let visibility_increment = 8; // Number of levels to change visibility ranges
+let max_difficulty_level = 5; // Number of levels where visibility will no longer change
 let mchain;
 let sound;
 
@@ -61,7 +61,7 @@ function setup() {
     centerCanvas();
     background("#000000");
     ellipseMode(RADIUS);
-    colorMode(HSB);
+    colorMode(HSB,360,100,100);
     room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE);
 
     mchain = new markovGen(50);
@@ -101,9 +101,9 @@ function keyPressed() {
 }
 
 // Generates a new level when the mouse is clicked
-function mousePressed() {
-    generate_new_level(false);
-}
+// function mousePressed() {
+//     generate_new_level(false);
+// }
 
 // Finds position of a given value in 2d grid array
 function findPos(value) {
@@ -199,9 +199,9 @@ function generate_new_level(level_increment) {
     // If the level number is increasing, the level is increased and visibility is adjusted on a set interval
     if (level_increment) {
         level = level + 1;
-        if (level % visibility_increment == 0 && level <= max_visibility_level) {
+        if (level % visibility_increment == 0 && difficulty_level < max_difficulty_level) {
             changeVisibilityRange();
-            difficulty_level = difficulty_level + 1;
+            difficulty_level++;
         }
     }
     room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
@@ -233,9 +233,9 @@ function drawVisibility(y, x) {
         if (r < start_visibility) {
             alpha = 0;
         } else if (r >= start_visibility && r <= end_visibility) {
-            alpha = (255 / (end_visibility - start_visibility)) * (r - start_visibility);
+            alpha = ((r + 1 - start_visibility) / (end_visibility - start_visibility));
         } else {
-            alpha = 255;
+            alpha = 1;
         }
         fill_color = color(0, 0, 0, alpha);
         stroke(fill_color);
