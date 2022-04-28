@@ -6,8 +6,8 @@ function genPalette(type){
         'f' : color("#669c35"), //forest room
         'v' : color("#cf1020"), //volcano
         'c' : color("#7b5847"), //cave
-        's' : color("#c0c0c0"), //space
-        'r' : color(random(100), random(100), random(255)), //space
+        's' : color("#041b1e"), //space
+        'r' : color(random(360), random(100), random(30,100)), //space
     }
     const baseColor = levels[type] || color(15, 95, 60);
 
