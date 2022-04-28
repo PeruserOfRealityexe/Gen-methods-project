@@ -1,4 +1,9 @@
 // Original code adopted from Chris Martens. Ported from .pde version, 2022-02-15
+// Chris Martens Ported from .pde version, 2022-02-15
+// This code setup was boilerplate for the cellurar automata
+// added walls renderer code
+
+// [get regions code source]
 
 // Creates a generator for making random rooms
 class room_generator {

@@ -1,6 +1,4 @@
-// Chris Martens
-// Ported from .pde version, 2022-02-15
-
+// [p5 and p5js source stuff]
 // Constants
 const PIXEL_SIZE = 24;
 //const ROCK = 0, FLOOR = 1, WALL = 2, ITEM = 3; //added item
@@ -56,7 +54,7 @@ function windowResized() {
 }
 
 function setup() {
-    sound = loadSound("audio/suspense-loop-3.wav");
+    sound = loadSound("audio/5-5.mp3");
     cnv = createCanvas(PIXEL_SIZE * ROOM_SIZE + 100, PIXEL_SIZE * ROOM_SIZE);
     centerCanvas();
     background("#000000");
@@ -205,7 +203,7 @@ function generate_new_level(level_increment) {
         }
     }
     room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
-    room_num = room_num + 1.75;
+    room_num = room_num + 2.25;
     room.generate_room();
     player_pos = findPos(-1);
     end_pos = findPos(-2);
