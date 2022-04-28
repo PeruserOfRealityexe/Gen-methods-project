@@ -1,3 +1,10 @@
+/**
+ * This function, given a room type generates an array of colors for use in rendering our room.
+ * 
+ * @author Shreyash Mohatta
+ * @param {char} type A single char that represents a room type
+ * @returns An array of colors representing a 
+ */
 function genPalette(type){
 
     const levels = {

@@ -1,31 +1,21 @@
-// [p5 and p5js source stuff]
+/**
+ * p5 & p5-sound
+ * @link https://p5js.org/
+ * @author Lauren Lee McCarthy, Qianqian Ye, Evelyn Masso, community collaborators, Processing Foundation, and NYU ITP
+ * @license GNU_version_2.1
+ * @license Creative_Commons
+ * 
+ * p5 provides framework for rendering objects in a scene, among others
+ * p5-sound provides framework for using sound in p5
+ * 
+ * Our group made no changes to either library
+ */
+
 // Constants
-const PIXEL_SIZE = 24;
-//const ROCK = 0, FLOOR = 1, WALL = 2, ITEM = 3; //added item
-//const START = -1, END = -2;
-const ROOM_SIZE = 20;
-const FRAME_RATE = 10;
-
-// CA rule parameters
-//const T1 = 5, T2 = 4;
-
-// Global variables
-let level = 1; // Current level the player is on
-let difficulty_level = 1; // Current visibility difficulty level
-let max_iters = 5;
-let room_num = 0; // Number of rooms generated
-let room;
-let room_grid;
-let player_pos, end_pos;
-let key_buffer = [];
-let start_visibility = 150; // Radius in pixels of edge of complete visibility
-let end_visibility = 300; // Radius in pixels of edge of visibility
-let visibility_increment = 8; // Number of levels to change visibility ranges
-let max_difficulty_level = 5; // Number of levels where visibility will no longer change
-let mchain;
-let sound;
-
-const basic_tile_enum = Object.freeze({
+const PIXEL_SIZE = 24; // The size of our "pixel" square in pixels
+const ROOM_SIZE = 20; // The size of the room to render (ROOM_SIZE x ROOM_SIZE)
+const FRAME_RATE = 10; // The framerate of the sketch -> higher=faster movement
+const basic_tile_enum = Object.freeze({ // Enum that stores the possible tile types for a room
     rock: 0,
     floor: 1,
     wall: 2,
@@ -33,53 +23,69 @@ const basic_tile_enum = Object.freeze({
     end: -2,
 });
 
-let basic_tile_scheme = {
-    floor_color: "#ffffff", // black - can
-    rock_color: "#000000", // white - can travel 1
+// Global variables
+let level = 1; // Current level the player is on
+let difficulty_level = 1; // Current visibility difficulty level
+let max_iters = 5; // The max nuber of iterations for the Celluar Automata methods
+let room_num = 0; // Number of rooms generated
+let room; // Variable storage for the current room
+let room_grid; // Variable storage for the 2D grid of the current room
+let player_pos, end_pos; // Variable storage for the current position of the player and exit
+let key_buffer = []; // Storage key inputs for processing (kinda N-keyish)
+let start_visibility = 150; // Radius in pixels of edge of complete visibility
+let end_visibility = 300; // Radius in pixels of edge of visibility
+let visibility_increment = 8; // Number of levels to change visibility ranges
+let max_difficulty_level = 5; // Number of levels where visibility will no longer change
+let mchain; // Variable storage for the created Markov Chain
+let sound; // Variable storage for p5-sound instance
+let basic_tile_scheme = { // base color palette for rendering the room
+    floor_color: "#ffffff", // black
+    rock_color: "#000000", // white
     wall_color: "#858585", // med/dark grey
     player_color: "green",
     end_color: "red",
 };
 
-var cnv;
+var cnv; // Stores the canvas instance
 
+// Centers the canvas in the window
 function centerCanvas() {
     var x = (windowWidth - width) / 2;
     var y = (windowHeight - height) / 2;
     cnv.position(x, y);
 }
 
+// When the window is resized, recenter the canvas
 function windowResized() {
     centerCanvas();
 }
 
+// p5 setup function 
 function setup() {
-    sound = loadSound("audio/5-5.mp3");
+    sound = loadSound("audio/suspense-loop-3.wav"); // Load soundtrack
     cnv = createCanvas(PIXEL_SIZE * ROOM_SIZE + 100, PIXEL_SIZE * ROOM_SIZE);
     centerCanvas();
     background("#000000");
     ellipseMode(RADIUS);
     colorMode(HSB,360,100,100);
-    room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE);
 
-    mchain = new markovGen(50);
+    room = new room_generator(max_iters, ROOM_SIZE, basic_tile_enum, PIXEL_SIZE); // Create new room generator
+    mchain = new markovGen(50); // Create new Markov chain
 
     generate_new_level();
-    //console.log(room.getRegions()); //Added
+    room_grid = room.grid; // Assigns the grid created by the generator to room_grid
 
-    room_grid = room.grid;
-
-    // console.log(player_pos);
-    // console.log(end_pos);
-
-    frameRate(FRAME_RATE);
+    frameRate(FRAME_RATE); // Set the framerate of the sketch
 }
 
+// p5 draw function
 function draw() {
-    queueInputs();
-    check_input_direction();
-    room.render_room(basic_tile_scheme);
-    drawVisibility(player_pos[0] * PIXEL_SIZE + PIXEL_SIZE / 2, player_pos[1] * PIXEL_SIZE + PIXEL_SIZE / 2);
+    queueInputs(); // Queue user inputs
+    check_input_direction(); // Determine where the user is moving in the room
+    room.render_room(basic_tile_scheme); // Render the room
+    drawVisibility(player_pos[0] * PIXEL_SIZE + PIXEL_SIZE / 2, player_pos[1] * PIXEL_SIZE + PIXEL_SIZE / 2); // Culls room visbaility
+
+    // Write out text sidebar
     stroke("white");
     strokeWeight(5);
     noFill();
@@ -91,17 +97,13 @@ function draw() {
     text("Difficulty: " + difficulty_level.toString(), PIXEL_SIZE * ROOM_SIZE + 20, 50);
 }
 
+// When a key is pressed, start the music
 function keyPressed() {
     if (!sound.isPlaying()) {
         sound.play();
         sound.loop();
     }
 }
-
-// Generates a new level when the mouse is clicked
-// function mousePressed() {
-//     generate_new_level(false);
-// }
 
 // Finds position of a given value in 2d grid array
 function findPos(value) {
@@ -202,18 +204,20 @@ function generate_new_level(level_increment) {
             difficulty_level++;
         }
     }
-    room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); //if < 0.5 set to 0.5
+
+    // Generates a new room
+    room.generate_dungeon_random(0.99 - room_num * 0.01 < 0.5 ? 0.5 : 0.99 - room_num * 0.01); // if < 0.5 set to 0.5
     room_num = room_num + 2.25;
     room.generate_room();
+    // Find player and exit locations
     player_pos = findPos(-1);
     end_pos = findPos(-2);
+    // Update the markov chain and color palette
     let c = mchain.markovState();
     let shades = genPalette(c);
     basic_tile_scheme["floor_color"] = shades[0];
     basic_tile_scheme["wall_color"] = shades[2];
     basic_tile_scheme["rock_color"] = shades[4];
-    console.log(shades);
-    console.log(c);
 }
 
 // Adjusts the visibility ranges as the difficulty increases

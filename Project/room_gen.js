@@ -1,11 +1,19 @@
-// Original code adopted from Chris Martens. Ported from .pde version, 2022-02-15
-// Chris Martens Ported from .pde version, 2022-02-15
-// This code setup was boilerplate for the cellurar automata
-// added walls renderer code
-
-// [get regions code source]
-
-// Creates a generator for making random rooms
+/**
+ * This class generates the playable rooms via celluar automata
+ * 
+ * Celluar Automata Code:
+ * @link https://editor.p5js.org/chrisamaphone/sketches/lN211pY4w
+ * @author Chris Martens
+ * @license Fair_Use
+ * 
+ * Chris Martens Ported from .pde version, 2022-02-15
+ * 
+ * The original code provided a boilerplate for rendering a 2D grid via Celluar Automata
+ * We adapted the code by:
+ * - shifting the code into a class
+ * - adding the rendering code
+ * - Adding code to determine regions of playing space
+ */
 class room_generator {
     constructor(max_iters, size, tile_types, p_size) {
         this.grid = []; // 2D grid of the room
@@ -17,25 +25,22 @@ class room_generator {
         this.T2 = 4; // If neighbor value is < T2
         this.p_size = p_size;
         this.tile_types = tile_types;
-        //generate_dungeon_random(); // randomizes the room
     }
 
     // Takes the random layout and iterate on the cells
     generate_room() {
-        // console.log(this);
+        // Applys different rulesets based on the iteration
         while (this.num_iters < this.max_iters) {
             this.iterate_cells(this.update_cell);
         }
         if (this.num_iters == this.max_iters) {
             this.iterate_cells(this.update_wall);
         }
-        //
-        let regions = this.getRegions();//
-        console.log(regions);
-        let room_size = 2;
+        
+        let regions = this.getRegions(); // Grabs all traverable regions
+        let room_size = 2; // The minimum size that a playable room can be 
         let idx = 0;
-        for(let x = 0; x < regions.length; x++) {
-            //maybe add length var here
+        for(let x = 0; x < regions.length; x++) { // Determines the largest regions
             if (regions[x].length >= room_size) {
                 idx = x;
                 room_size = regions[x].length;
@@ -43,22 +48,6 @@ class room_generator {
         }
         this.grid[regions[idx][0].x][regions[idx][0].y]=-1;
         this.grid[regions[idx][room_size - 1].x][regions[idx][room_size - 1].y]=-2;
-
-        //
-        /** 
-        let y = Math.floor(Math.random() * this.cols);
-        let x = Math.floor(Math.random() * this.cols);
-        while (this.grid[y][x] != 1) {
-            y = Math.floor(Math.random() * this.cols);
-            x = Math.floor(Math.random() * this.cols);
-        }
-        this.grid[y][x] = -1;
-        while (this.grid[y][x] != 1) {
-            y = Math.floor(Math.random() * this.cols);
-            x = Math.floor(Math.random() * this.cols);
-        }
-        this.grid[y][x] = -2;
-        */
     }
 
     // Generates the first iteration of a room layout
@@ -68,8 +57,7 @@ class room_generator {
         for (let i = 0; i < this.rows; i++) {
             this.grid.push([]);
             for (let j = 0; j < this.cols; j++) {
-                if (random(1) <= floor_value) { //0.9 works (in theory, the progression system should work, just need to pass the random value in)
-                    // Flips a coin to determine tiletype
+                if (random(1) <= floor_value) {
                     this.grid[i].push(this.tile_types.floor);
                 } else {
                     this.grid[i].push(this.tile_types.rock);
@@ -190,16 +178,22 @@ class room_generator {
             }
         }
     }
-
-
-    setStartlocation() {
-
-    }
   
-    //causes a lag spike, maybe add a start location
-    //So currently this works MOST of the time but i can lag still
+    /**
+     * This function evaluates the available regions in a 2D grid
+     * @link https://github.com/SebLague/Procedural-Cave-Generation/blob/master/Episode%2005/MapGenerator.cs
+     * @link https://www.youtube.com/watch?v=xYOG8kH2tF8
+     * @author Sebastian SebLague
+     * @license Fair_Use
+     * 
+     * This code determines the travserible regions in a 2D grid
+     * We adapted the code by:
+     * - shifting the code to JS
+     * 
+     * @returns an array of available regions
+     */
     getRegions() {
-        let tiles_checked = [];
+        let tiles_checked = []; // Creates a 2D grid to determine if the location has been checked
         for (let i = 0; i < this.rows; i++) {
             tiles_checked.push([]);
             for (let j = 0; j < this.cols; j++) {
@@ -207,42 +201,21 @@ class room_generator {
             }
         }
 
-        
-      
-      
-        let regions = [];
+        let regions = []; // Stores all regions
             for (let i=0; i < this.rows; i++) {
                 for (let j=0; j < this.cols; j++) {
                     if(this.grid[i][j] == this.tile_types.floor && tiles_checked[i][j] == 0) {
-                        let region = [];
-                        let queue = [];
+                        let region = []; // Stores the current region
+                        let queue = []; // Stores the locations in the room that need to be checked
                         tiles_checked[i][j] = 1;
-                        //region.push(createVector(i,j));
                         queue.push(createVector(i,j));
-                        while (queue.length > 0) { // might be able to cull any lagging through checking that the legth of the current region isn't above 30 or somthing
+                        while (queue.length > 0) {
                             let coords = queue.shift();
-                            //tiles_checked[coords.x][coords.y] = 1; //commenting this out causes the error out of memory, but I think with it the output is incorrect
-                            
-                            //let added = false;
-                            //for (let x = 0; x < region.length; x++) {
-                            //    if (coords.equals(region[x])) {
-                            //        added = !added;
-                            //    }
-                            //}
-                            //if (!added) {
                             region.push(coords);
-                            //}
-              
-                            //if (region.length > 5) {
-                            //return region; //short cuts recursive process / probabily need exits to be interactable rather than leave on movement to
-                            //the last coords in the regions are being repeateded infinitely i think, needs more testing
-                            // potention short cut ensures minimum of traverseable space
-                            //}
-              
-              
                             for (let x = coords.x - 1; x <= coords.x + 1; x++) {
                                 for (let y = coords.y - 1; y <= coords.y + 1; y++) {
                                     if ((x > 0 && x < this.rows && y > 0 && y < this.cols) && (x == coords.x || y == coords.y)) {
+                                        // If the tile checked is a floor and hasn't been checked already, add it to the queue
                                         if (tiles_checked[x][y] == 0 && this.grid[x][y] == this.tile_types.floor) {
                                             tiles_checked[x][y] = 1;
                                             queue.push(createVector(x,y));
@@ -251,9 +224,6 @@ class room_generator {
                                 }
                             }
                         }
-                        //if (region.length > 1) { 
-                            //return region;
-                        //}
                         regions.push(region);
                     }
                 }

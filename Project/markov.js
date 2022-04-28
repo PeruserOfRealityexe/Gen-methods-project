@@ -1,11 +1,13 @@
 /**
- * Source: https://editor.p5js.org/codingtrain/sketches/Y6SvoMcyH
- * Author: codingtrain
- * License: Creative Commons -> GNU version 2.1
- * The inital code prodived functionality to output randomized text via Markov Chain.
+ * @link https://editor.p5js.org/codingtrain/sketches/Y6SvoMcyH
+ * @author codingtrain
+ * @license Creative_Commons
+ * @license GNU_version_2.1
+ * 
+ * The inital code prodived functionality to output randomized text via a Markov Chain.
  * We adapted the code by:
  * - Adding a puesudorandom text input
- * - shifting the output to chars
+ * - shifting the output to chars for room type selection
 */
 class markovGen {
     constructor(size){
