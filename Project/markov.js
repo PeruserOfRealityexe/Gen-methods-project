@@ -1,6 +1,15 @@
+/**
+ * Source: https://editor.p5js.org/codingtrain/sketches/Y6SvoMcyH
+ * Author: codingtrain
+ * License: Creative Commons -> GNU version 2.1
+ * The inital code prodived functionality to output randomized text via Markov Chain.
+ * We adapted the code by:
+ * - Adding a puesudorandom text input
+ * - shifting the output to chars
+*/
 class markovGen {
     constructor(size){
-        this.txt = this.txtGen(size);
+        this.txt = this.txtGen(size); // Generates the input text
         this.order = 1;
         this.ngrams = {};
         this.currentGram = this.txt.substring(0, this.order);
